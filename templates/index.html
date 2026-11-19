@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titanic Survival Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-decorations">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Input Panel -->
+        <div class="glass-card input-card">
+            <div class="card-header">
+                <h2>Survival Predictor</h2>
+                <p>Configure passenger profile attributes</p>
+            </div>
+
+            <form id="prediction-form">
+                <div class="form-group">
+                    <label for="Pclass">
+                        <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V7H3v2z"/></svg>
+                        Passenger Class
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="Pclass" required>
+                            <option value="1">1st Class (Upper Deck)</option>
+                            <option value="2">2nd Class (Middle Deck)</option>
+                            <option value="3" selected>3rd Class (Lower Deck)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Sex">
+                        <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/></svg>
+                        Gender
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="Sex" required>
+                            <option value="female">Female</option>
+                            <option value="male" selected>Male</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="Age">
+                            <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                            Age: <span id="age-val" class="slider-val">28</span> yrs
+                        </label>
+                        <input type="range" id="Age" min="1" max="80" value="28" step="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Fare">
+                            <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                            Fare: $<span id="fare-val" class="slider-val">32.20</span>
+                        </label>
+                        <input type="range" id="Fare" min="0" max="500" value="32.20" step="0.50">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="SibSp">Siblings/Spouses</label>
+                        <input type="number" id="SibSp" value="0" min="0" max="8" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Parch">Parents/Children</label>
+                        <input type="number" id="Parch" value="0" min="0" max="6" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Embarked">
+                        <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Port of Embarkation
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="Embarked" required>
+                            <option value="S" selected>Southampton (S)</option>
+                            <option value="C">Cherbourg (C)</option>
+                            <option value="Q">Queenstown (Q)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn" class="submit-btn">
+                    <span id="btn-text">Predict Survival</span>
+                    <div id="btn-spinner" class="spinner hidden"></div>
+                </button>
+            </form>
+        </div>
+
+        <!-- Analytical Output Panel -->
+        <div class="glass-card output-card">
+            <div class="card-header">
+                <h2>Prediction Analysis</h2>
+                <p>Machine learning survival confidence assessment</p>
+            </div>
+
+            <!-- Initial State -->
+            <div id="analysis-placeholder" class="placeholder-state">
+                <div class="pulse-icon">
+                    <svg viewBox="0 0 24 24" width="48" height="48"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/></svg>
+                </div>
+                <h3>Awaiting Input</h3>
+                <p>Adjust passenger parameters on the left and click <strong>Predict Survival</strong> to view predictions and impact factors.</p>
+            </div>
+
+            <!-- Active Prediction State -->
+            <div id="analysis-content" class="analysis-content hidden">
+                <div class="outcome-banner" id="outcome-banner">
+                    <div class="badge-icon-wrapper" id="outcome-icon"></div>
+                    <div class="outcome-details">
+                        <span class="outcome-subtitle">Predicted Outcome</span>
+                        <h3 id="outcome-title">Likely Survived</h3>
+                    </div>
+                    <div class="gauge-ring">
+                        <span id="probability-text">0%</span>
+                        <span class="gauge-label">Probability</span>
+                    </div>
+                </div>
+
+                <div class="impact-section">
+                    <h4>Feature Impact Breakdown</h4>
+                    
+                    <div class="impact-bar-group">
+                        <div class="impact-label">
+                            <span>Passenger Class Impact</span>
+                            <span id="class-impact-val">High</span>
+                        </div>
+                        <div class="bar-track">
+                            <div id="class-bar" class="bar-fill" style="width: 85%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="impact-bar-group">
+                        <div class="impact-label">
+                            <span>Gender Impact</span>
+                            <span id="sex-impact-val">Critical</span>
+                        </div>
+                        <div class="bar-track">
+                            <div id="sex-bar" class="bar-fill" style="width: 95%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="impact-bar-group">
+                        <div class="impact-label">
+                            <span>Age & Fare Weight</span>
+                            <span id="age-impact-val">Moderate</span>
+                        </div>
+                        <div class="bar-track">
+                            <div id="age-bar" class="bar-fill" style="width: 60%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-metrics">
+                    <div class="metric-card">
+                        <span class="metric-title">Passenger Profile</span>
+                        <span id="summary-profile" class="metric-val">Male, 3rd Class</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Model Accuracy</span>
+                        <span class="metric-val accent">82.1%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
